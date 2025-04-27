@@ -6,6 +6,11 @@ TagManager:
   tags:
   - Emerald
   - Head
+  - StillHead
+  - PositionDetector
+  - InPortalRoom
+  - InLighterRoom
+  - Portal
   layers:
   - Default
   - TransparentFX

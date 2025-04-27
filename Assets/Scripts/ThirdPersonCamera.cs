@@ -23,6 +23,8 @@ public class ThirdPersonCamera : MonoBehaviour
     private float yaw = 0f;
     private float pitch = 0f;
 
+    private bool cursorUnlocked = false;
+
     void Start()
     {
         // Optionnel : verrouiller et masquer le curseur pour une expérience immersive
@@ -34,21 +36,53 @@ public class ThirdPersonCamera : MonoBehaviour
         pitch = transform.eulerAngles.x;
     }
 
+    private void Update()
+    {
+        // Quand j'appuies sur clic droit (bouton 1), je toggles l’état du curseur
+        if (Input.GetMouseButtonDown(1))
+            ToggleCursorLock();
+    }
     void LateUpdate()
     {
-        // Récupérer la rotation de la souris pour un contrôle horizontal et vertical
-        yaw += Input.GetAxis("Mouse X") * mouseSensitivity * Time.deltaTime;
-        pitch -= Input.GetAxis("Mouse Y") * mouseSensitivity * Time.deltaTime;
-        pitch = Mathf.Clamp(pitch, minVerticalAngle, maxVerticalAngle);
+        if ( cursorUnlocked == false)
+        {
+            // Récupérer la rotation de la souris pour un contrôle horizontal et vertical
+            yaw += Input.GetAxis("Mouse X") * mouseSensitivity * Time.deltaTime;
+            pitch -= Input.GetAxis("Mouse Y") * mouseSensitivity * Time.deltaTime;
+            pitch = Mathf.Clamp(pitch, minVerticalAngle, maxVerticalAngle);
 
-        // Calculer la rotation combinée (pitch, yaw)
-        Quaternion rotation = Quaternion.Euler(pitch, yaw, 0);
-        // Déterminer l'offset de la caméra (en arrière et légèrement en hauteur)
-        Vector3 offset = new Vector3(0, height, -distance);
+            // Calculer la rotation combinée (pitch, yaw)
+            Quaternion rotation = Quaternion.Euler(pitch, yaw, 0);
+            // Déterminer l'offset de la caméra (en arrière et légèrement en hauteur)
+            Vector3 offset = new Vector3(0, height, -distance);
 
-        // Placer la caméra autour du personnage en appliquant la rotation à l'offset
-        transform.position = target.position + rotation * offset;
-        // Orienter la caméra pour qu'elle regarde toujours le personnage
-        transform.LookAt(target.position + Vector3.up * height);
+            // Placer la caméra autour du personnage en appliquant la rotation à l'offset
+            transform.position = target.position + rotation * offset;
+            // Orienter la caméra pour qu'elle regarde toujours le personnage
+            transform.LookAt(target.position + Vector3.up * height);
+        }
+        
     }
+
+    private void UnlockCursor()
+    {
+        cursorUnlocked = true;
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+    }
+
+    private void LockCursor()
+    {
+        cursorUnlocked = false;
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+
+    }
+
+    private void ToggleCursorLock()
+    {
+        if (cursorUnlocked) LockCursor();
+        else UnlockCursor();
+    }
+
 }
